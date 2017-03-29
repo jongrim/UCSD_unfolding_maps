@@ -10,13 +10,13 @@ import processing.core.PGraphics;
 /** Implements a visual marker for cities on an earthquake map
  * 
  * @author UC San Diego Intermediate Software Development MOOC team
- * @author Your name here
+ * @author Jonathan Grim
  *
  */
 // TODO: Change SimplePointMarker to CommonMarker as the very first thing you do 
 // in module 5 (i.e. CityMarker extends CommonMarker).  It will cause an error.
 // That's what's expected.
-public class CityMarker extends SimplePointMarker {
+public class CityMarker extends CommonMarker {
 	
 	public static int TRI_SIZE = 5;  // The size of the triangle marker
 	
@@ -35,23 +35,41 @@ public class CityMarker extends SimplePointMarker {
 	/**
 	 * Implementation of method to draw marker on the map.
 	 */
-	public void draw(PGraphics pg, float x, float y) {
-		// Save previous drawing style
+//	public void draw(PGraphics pg, float x, float y) {
+//		// Save previous drawing style
+//		pg.pushStyle();
+//
+//		// IMPLEMENT: drawing triangle for each city
+//		pg.fill(150, 30, 30);
+//		pg.triangle(x, y-TRI_SIZE, x-TRI_SIZE, y+TRI_SIZE, x+TRI_SIZE, y+TRI_SIZE);
+//
+//		// Restore previous drawing style
+//		pg.popStyle();
+//		super.draw(pg, x, y);
+//	}
+
+	public void drawMarker(PGraphics pg, float x, float y) {
 		pg.pushStyle();
-		
+
 		// IMPLEMENT: drawing triangle for each city
 		pg.fill(150, 30, 30);
 		pg.triangle(x, y-TRI_SIZE, x-TRI_SIZE, y+TRI_SIZE, x+TRI_SIZE, y+TRI_SIZE);
-		
+
 		// Restore previous drawing style
 		pg.popStyle();
 	}
-	
+
 	/** Show the title of the city if this marker is selected */
+	@Override
 	public void showTitle(PGraphics pg, float x, float y)
 	{
-		
-		// TODO: Implement this method
+		if (isSelected()) {
+			pg.fill(100, 100, 100);
+			pg.rect(x, y, 150, 50, 15);
+			pg.fill(255, 255, 255);
+			pg.textAlign(PConstants.CENTER, PConstants.CENTER);
+			pg.text(this.getCity() + "\n" + this.getPopulation(), x, y, 150, 50);
+		}
 	}
 	
 	

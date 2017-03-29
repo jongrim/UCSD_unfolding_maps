@@ -13,6 +13,8 @@ import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.marker.MultiMarker;
 import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.providers.MBTilesMapProvider;
+import de.fhpotsdam.unfolding.providers.Microsoft;
+import de.fhpotsdam.unfolding.providers.OpenStreetMap;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import parsing.ParseFeed;
 import processing.core.PApplet;
@@ -20,7 +22,7 @@ import processing.core.PApplet;
 /** EarthquakeCityMap
  * An application with an interactive map displaying earthquake data.
  * Author: UC San Diego Intermediate Software Development MOOC team
- * @author Your name here
+ * @author Jonathan Grim
  * Date: July 17, 2015
  * */
 public class EarthquakeCityMap extends PApplet {
@@ -41,7 +43,7 @@ public class EarthquakeCityMap extends PApplet {
 	public static String mbTilesString = "blankLight-1-3.mbtiles";
 	
 	//feed with magnitude 2.5+ Earthquakes
-	private String earthquakesURL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.atom";
+	private String earthquakesURL = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.atom";
 	
 	// The files containing city names and info and country names and info
 	private String cityFile = "city-data.json";
@@ -70,9 +72,9 @@ public class EarthquakeCityMap extends PApplet {
 		    earthquakesURL = "2.5_week.atom";  // The same feed, but saved August 7, 2015
 		}
 		else {
-			map = new UnfoldingMap(this, 200, 50, 650, 600, new Google.GoogleMapProvider());
+			map = new UnfoldingMap(this, 200, 50, 650, 600, new OpenStreetMap.OpenStreetMapProvider());
 			// IF YOU WANT TO TEST WITH A LOCAL FILE, uncomment the next line
-		    //earthquakesURL = "2.5_week.atom";
+		    earthquakesURL = "2.5_week.atom";
 		}
 		MapUtils.createDefaultEventDispatcher(this, map);
 		
@@ -145,7 +147,15 @@ public class EarthquakeCityMap extends PApplet {
 	// 
 	private void selectMarkerIfHover(List<Marker> markers)
 	{
-		// TODO: Implement this method
+		for (Marker marker: markers) {
+			if (lastSelected != null) {
+				break;
+			}
+			if (marker.isInside(map, mouseX, mouseY)) {
+				lastSelected = (CommonMarker)marker;
+				lastSelected.setSelected(true);
+			}
+		}
 	}
 	
 	/** The event handler for mouse clicks
@@ -156,12 +166,52 @@ public class EarthquakeCityMap extends PApplet {
 	@Override
 	public void mouseClicked()
 	{
-		// TODO: Implement this method
+		if (lastClicked != null) {
+			lastClicked.clicked = false;
+			unhideMarkers();
+			lastClicked = null;
+			return;
+		}
+
+		for (Marker marker: cityMarkers) {
+//			if (lastClicked != null) {
+//				break;
+//			}
+			if (marker.isInside(map, mouseX, mouseY)) {
+				lastClicked = (CommonMarker)marker;
+				lastClicked.clicked = true;
+				hideMarkers();
+			}
+		}
+
+		for (Marker marker: quakeMarkers) {
+//			if (lastClicked != null) {
+//				break;
+//			}
+			if (marker.isInside(map, mouseX, mouseY)) {
+				lastClicked = (CommonMarker)marker;
+				lastClicked.clicked = true;
+				hideMarkers();
+			}
+
+		}
 		// Hint: You probably want a helper method or two to keep this code
 		// from getting too long/disorganized
 	}
 	
-	
+	private void hideMarkers() {
+		for(Marker marker : quakeMarkers) {
+			if (!((CommonMarker)marker).clicked) {
+				marker.setHidden(true);
+			}
+		}
+
+		for(Marker marker : cityMarkers) {
+			if (!((CommonMarker)marker).clicked) {
+				marker.setHidden(true);
+			}
+		}
+	}
 	// loop over and unhide all markers
 	private void unhideMarkers() {
 		for(Marker marker : quakeMarkers) {
